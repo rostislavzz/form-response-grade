@@ -24,7 +24,7 @@ export default class Verifier {
       return 0;
     }
 
-    if (responseCorrectAnswerCount >= itemCorrectAnswerCount / 2) {
+    if (responseCorrectAnswerCount > itemCorrectAnswerCount / 2) {
       console.info(`Item №${index}. Score: 1`);
       return 1;
     }
