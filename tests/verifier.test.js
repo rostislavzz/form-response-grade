@@ -84,3 +84,30 @@ it("Check Verifier. Choices: 6, Correct: 4, Selected: 2, Wrong: 0 => Score: 0", 
   expect(getResponse).toHaveBeenCalled();
   expect(score).toBe(0);
 });
+
+it("Check Verifier. Choices: 10, Correct: 4, Selected: 3, Wrong: 1 => Score: 0", () => {
+  const getChoices = jest
+    .spyOn(CheckboxItem.prototype, "getChoices")
+    .mockReturnValue([
+      new Choice("value 1", true),
+      new Choice("value 2", true),
+      new Choice("value 3", true),
+      new Choice("value 4", true),
+      new Choice("value 5", false),
+      new Choice("value 6", false),
+      new Choice("value 7", false),
+      new Choice("value 8", false),
+      new Choice("value 9", false),
+      new Choice("value 10", false),
+    ]);
+
+  const getResponse = jest
+    .spyOn(itemResponse, "getResponse")
+    .mockReturnValue(["value 1", "value 2", "value 5"]);
+
+  const score = verifier.getScore(item, itemResponse);
+
+  expect(getChoices).toHaveBeenCalled();
+  expect(getResponse).toHaveBeenCalled();
+  expect(score).toBe(0);
+});

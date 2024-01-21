@@ -16,6 +16,9 @@ export default class Handler {
     let submitRequired = false;
     const formResponse = event.response;
 
+    console.info(`Respondent email: ${formResponse.getRespondentEmail()}`);
+    console.info(`Edit response URL: ${formResponse.getEditResponseUrl()}`);
+
     for (let i = 0; i < items.length; i++) {
       const itemType = items[i].getType();
       if (this.allowedItemTypes.indexOf(itemType) === -1) {
@@ -31,6 +34,12 @@ export default class Handler {
 
       if (itemType === FormApp.ItemType.CHECKBOX) {
         const score = this.verifier.getScore(items[i], itemResponse);
+
+        if (score == itemResponse.getScore()) {
+          console.info(`Item №${items[i].getIndex()}. Score already set: ${itemResponse.getScore()}. Skip`);
+          continue;
+        }
+
         itemResponse.setScore(score);
         submitRequired = true;
       }
@@ -45,9 +54,9 @@ export default class Handler {
           itemResponse.setFeedback(feedback);
         }
 
-        // Получение ответа от ChatGPT могло занять много времени,
-        // а лимит на выполнение скрипта 6 минут (https://developers.google.com/apps-script/guides/services/quotas).
-        // Поэтому, если получили ответ, сразу сохраняем и выходим
+        // Лимит на выполнение скрипта 6 минут (https://developers.google.com/apps-script/guides/services/quotas),
+        // но получение ответа от ChatGPT могло занять много времени.
+        // Поэтому, если получили ответ, сразу сохраняем и выходим.
         if (score || feedback) {
           formResponse.withItemGrade(itemResponse);
           form.submitGrades([formResponse]);
@@ -61,5 +70,15 @@ export default class Handler {
     if (submitRequired) {
       form.submitGrades([formResponse]);
     }
+  }
+
+  logResponsesInfo() {
+    let form = FormApp.getActiveForm();
+    let responses =  form.getResponses();
+
+    responses.forEach(response => {
+      console.info(`Respondent email: ${response.getRespondentEmail()}`);
+      console.info(`Edit response URL: ${response.getEditResponseUrl()}`);
+    });
   }
 }
