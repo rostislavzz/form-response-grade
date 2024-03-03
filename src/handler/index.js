@@ -5,7 +5,7 @@ export default class Handler {
   }
 
   verifyFormResponse(event) {
-    console.info("Trigger. Verify form response");
+    console.info("Handler. Verify form response");
 
     const form = event.source;
     const items = form.getItems();

@@ -1,4 +1,4 @@
-import { MESSAGE_TEMPLATE } from "./message";
+import { SYSTEM_MESSAGE_TEMPLATE, USER_MESSAGE_TEMPLATE } from "./message";
 
 export default class Verifier {
   constructor(openai) {
@@ -18,9 +18,13 @@ export default class Verifier {
 
     console.info(`Item №${index}. Response. Selected: ${response.length}, correct: ${responseCorrectAnswerCount}, wrong: ${responseWrongAnswerCount}`);
 
-    // Пропуск ответа если число не правильно выбранных вариантов 2 и более
-    if (responseWrongAnswerCount >= 2) {
-      console.info(`Item №${index}. The number of incorrect answers >= 2. Score: 0`);
+    if (responseWrongAnswerCount == 1 && responseCorrectAnswerCount == 1) {
+      return 1;
+    }
+
+    // Если число НЕ правильно выбранных вариантов ответа более одного - 0 баллов
+    if (responseWrongAnswerCount > 1) {
+      console.info(`Item №${index}. The number of incorrect answers > 1. Score: 0`);
       return 0;
     }
 
@@ -54,12 +58,14 @@ export default class Verifier {
       return false;
     }
 
-    let message = MESSAGE_TEMPLATE.replace("{points}", points);
-    message = message.replace("{question}", textItem.getTitle());
-    message = message.replace("{answer}", response);
-    console.info(`Item №${index}. Message: ${message}`);
+    const system = SYSTEM_MESSAGE_TEMPLATE.replace("{points}", points);
+    console.info(`Item №${index}. System message: ${system}`);
 
-    const answer = this.openai.chat(message);
+    let user = USER_MESSAGE_TEMPLATE.replace("{question}", textItem.getTitle());
+    user = user.replace("{answer}", response);
+    console.info(`Item №${index}. User message: ${user}`);
+
+    const answer = this.openai.chat(system, user);
     if (!answer) {
       console.info(`Item №${index}. ChatGPT did not give an answer`);
       return false;

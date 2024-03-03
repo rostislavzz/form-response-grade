@@ -4,14 +4,14 @@ export default class OpenAI {
     this.url = 'https://api.openai.com/v1/chat/completions';
   }
 
-  chat(message) {
+  chat(system, user) {
     const params = {
       "method": "post",
       "contentType": "application/json",
       "headers": {
         "Authorization": `Bearer ${this.token}`
       },
-      "payload": this.getPayload(message),
+      "payload": this.getPayload(system, user),
       "muteHttpExceptions": false,
       "followRedirects": false
     };
@@ -35,17 +35,17 @@ export default class OpenAI {
     return answer;
   }
 
-  getPayload(content) {
+  getPayload(system, user) {
     const payload = {
       "model": "gpt-3.5-turbo",
       "messages": [
         {
           "role": "system",
-          "content": "Количество поставленных баллов укажи в формате: 'Баллы: число'."
+          "content": system
         },
         {
           "role": "user",
-          "content": content
+          "content": user
         }
       ]
     }
